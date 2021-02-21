@@ -15,30 +15,30 @@ class Covid:
         self.soup = BeautifulSoup(self.full_page.content, 'html.parser')
 
     def covid_globe(self):
-        convert = self.soup.find_all('div', class_='o6Yscf')
-        items = convert[0].find_all('td', {'jsname': 'VBiLTe'})
-
+        items = self.soup.find('div', class_='o6Yscf').find_all('td', {'jsname': 'VBiLTe'})
         info = []
         for item in items:
             info.append(item.find('span').get_text())
         print('Случаи заболевания: ' + info[0] + "; " + "Выздоровело: " + info[1] + "; " + "Умерло: " + info[2])
 
     def covid_country(self, name):
-        convert = self.soup.find_all('div', class_='iaUz9d')
-        countries = convert[0].find_all('tr', {'class': 'viwUIc'})
-
+        name = name.strip()
+        countries = self.soup.find('div', class_='iaUz9d').find_all('tr', {'class': 'viwUIc'})
+        not_found = True
         for country in countries:
-            if len(country.find_all('td', {'data-vfs': name})) > 0:
+            if country.find('td', {'data-vfs': name}):
                 info = []
                 items = country.find_all('td')
                 for item in items:
                     info.append(item.find('span').get_text())
                 print('Страна: ' + info[0] + '; ' + 'Случаи заболевания ' + info[1] + '; '
                       + 'Выздоровело ' + info[2] + '; ' + 'Умерло ' + info[3])
+                not_found = False
                 break
+        if not_found:
+            print("No results for: " + name)
 
-    def popular_five_countries(self):
-        convert = self.soup.find_all('div', class_='iaUz9d')
-        countries = convert[0].find_all('tr', {'class': 'viwUIc'})
+    def top_five_countries(self):
+        countries = self.soup.find('div', class_='iaUz9d').find_all('tr', {'class': 'viwUIc'}, limit=6)
         for i in range(1, 6):
             print(i, countries[i].find('span').get_text())
